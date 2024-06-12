@@ -1,21 +1,37 @@
 
 import { StyleSheet, View } from 'react-native'
-import { ActivityIndicator, Button, Text } from 'react-native-paper'
+import { ActivityIndicator, Text } from 'react-native-paper'
 import { getPokemons } from '../../../actions'
 import { useQuery } from '@tanstack/react-query'
-import { PokeballBg } from '../../components/ui/PokeballBG'
+import { PokeballBg } from '../../components/ui/PokeballBg'
+import { FlatList } from 'react-native-gesture-handler'
+import { globalTheme } from '../../../config/theme/global-theme'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { PokemonCard } from '../../components/pokemons/PokemonCard'
 
 export const HomeScreen = () => {
 
-    const { isLoading, data = [] } = useQuery({
+    const { top } = useSafeAreaInsets();
+
+    const { isLoading, data: pokemons = [] } = useQuery({
         queryKey:['pokemons'],
         queryFn: () => getPokemons(0),
         staleTime: 1000 * 60 * 10, // 60 minutos considerada como fresca 
     });
     
     return (
-        <View >
+        <View style={ globalTheme.globalMargin }>
             <PokeballBg style={ styles.imgPosition }/>
+            <FlatList
+                data={ pokemons }
+                keyExtractor={ (pokemon, index) => `${pokemon.id}-${index}`}
+                numColumns={ 2 }
+                style={{ paddingTop: top + 20 }}
+                ListHeaderComponent={ () => (
+                    <Text variant='displayMedium'>Pokedex</Text>
+                )}
+                renderItem={ ({item}) => <PokemonCard pokemon={ item }/> }
+            />
         </View>
     )
 }

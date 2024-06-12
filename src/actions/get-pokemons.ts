@@ -3,14 +3,14 @@ import type { Pokemon } from "../domain/entities/pokemon";
 import type { PokeAPIPaginatedResponse, PokeAPIPokemon } from "../infraestructure/interfaces/pokeapi.interfaces";
 import { PokemonMapper } from "../infraestructure/mappers/pokemon.mapper";
 
-// Solo para simular retraso en una respuesta
-export const sleep = async() => {
-    return new Promise( resolve => setTimeout(resolve,2000));
-}
+// // Solo para simular retraso en una respuesta
+// export const sleep = async() => {
+//     return new Promise( resolve => setTimeout(resolve,2000));
+// }
 
 export const getPokemons = async ( page: number, limit: number=20 ):Promise<Pokemon[]> => {
 
-    await sleep(); //solo para pruebas intentando mostrar un retraso
+    // await sleep(); //solo para pruebas intentando mostrar un retraso
 
     try {
         const url = `/pokemon?offset=${ page * 10 }&limit=${ limit }`;
@@ -28,12 +28,13 @@ export const getPokemons = async ( page: number, limit: number=20 ):Promise<Poke
 
         // Como trae mucha data crearemos un mapper para que filtremos solo la data necesaria
         const pokemons = pokeApiPokemons.map( (item) => PokemonMapper.pokeApiPokemonToEntity(item.data) );
-        console.log(JSON.stringify( pokemons[0],null,2 ));
+        // console.log(JSON.stringify( pokemons[0],null,2 ));
 
         // console.log(JSON.stringify(pokeApiPokemons,null,2));
         // console.log(JSON.stringify(data,null,2));
 
-        return [];
+        return pokemons;
+
     } catch (error) {
         throw new Error('Error getting pokemons')
     }
