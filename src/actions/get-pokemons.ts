@@ -27,13 +27,12 @@ export const getPokemons = async ( page: number, limit: number=20 ):Promise<Poke
         const pokeApiPokemons = await Promise.all(pokemonPromises);
 
         // Como trae mucha data crearemos un mapper para que filtremos solo la data necesaria
-        const pokemons = pokeApiPokemons.map( (item) => PokemonMapper.pokeApiPokemonToEntity(item.data) );
+        const pokemonsPromises = pokeApiPokemons.map( (item) => PokemonMapper.pokeApiPokemonToEntity(item.data) );
         // console.log(JSON.stringify( pokemons[0],null,2 ));
-
         // console.log(JSON.stringify(pokeApiPokemons,null,2));
         // console.log(JSON.stringify(data,null,2));
 
-        return pokemons;
+        return await Promise.all(pokemonsPromises);
 
     } catch (error) {
         throw new Error('Error getting pokemons')

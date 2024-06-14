@@ -6,6 +6,6 @@ export interface Pokemon {
     avatar: string;
     sprites: string[];
 
-    // toDo:
-    // color: string;
+    // toDo: parte de la entidad
+    color: string;
 }
