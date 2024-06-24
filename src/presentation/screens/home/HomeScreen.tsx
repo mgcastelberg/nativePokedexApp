@@ -2,7 +2,7 @@
 import { StyleSheet, View } from 'react-native'
 import { ActivityIndicator, Text } from 'react-native-paper'
 import { getPokemons } from '../../../actions'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery, QueryClient, useQueryClient } from '@tanstack/react-query';
 import { PokeballBg } from '../../components/ui/PokeballBg'
 import { FlatList } from 'react-native-gesture-handler'
 import { globalTheme } from '../../../config/theme/global-theme'
@@ -12,6 +12,7 @@ import { PokemonCard } from '../../components/pokemons/PokemonCard'
 export const HomeScreen = () => {
 
     const { top } = useSafeAreaInsets();
+    const queryClient = useQueryClient(); //cargar la cache de antemano
 
     // Hook Poderoso StakTankQuery - Forma tradicional http
     // const { isLoading, data: pokemons = [] } = useQuery({
@@ -25,9 +26,15 @@ export const HomeScreen = () => {
     const { isLoading, data, fetchNextPage } = useInfiniteQuery({
         queryKey:['pokemons', 'infinite'],
         initialPageParam: 0,
-        queryFn: ( params ) => getPokemons(params.pageParam),
+        staleTime: 1000 * 60 * 60, // 60 minutos considerada como fresca 
+        queryFn: async( params ) => {
+            const pokemons = await getPokemons(params.pageParam); 
+            pokemons.forEach( pokemon => {
+                queryClient.setQueryData( ['pokemon', pokemon.id] , pokemon );
+            });
+            return pokemons;
+        },
         getNextPageParam: ( lastPage, pages ) => pages.length,
-        staleTime: 1000 * 60 * 10, // 60 minutos considerada como fresca 
     });
     
     return (
