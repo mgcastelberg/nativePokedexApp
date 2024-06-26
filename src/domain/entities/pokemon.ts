@@ -8,4 +8,19 @@ export interface Pokemon {
 
     // toDo: parte de la entidad
     color: string;
+
+    games: string[];
+    abilities: string[];
+    stats: Stat[];
+    moves: Move[];
+}
+
+export interface Stat {
+    name: string;
+    value: number;
+}
+
+export interface Move {
+    name: string;
+    level: number;
 }
