@@ -7,6 +7,7 @@ import { Pokemon } from '../../../domain/entities/pokemon';
 import { PokemonCard } from '../../components/pokemons/PokemonCard';
 import { getPokemonNamesWithId } from '../../../actions';
 import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 
 export const SearchScreen = () => {
 
@@ -19,6 +20,25 @@ export const SearchScreen = () => {
 
     // console.log(pokemonNameList);
 
+    const [term, setTerm] = useState('');
+    // toDO: Aplicar debounce
+    const pokemonNameIdList = useMemo( () => {
+        // Es un número
+        if ( !isNaN(Number(term)) ) {
+            const pokemon = pokemonNameList.find( pokemon => pokemon.id === Number(term) );
+            return pokemon ? [pokemon] : [];
+        }
+
+        if (term.length === 0) return [];
+
+        if( term.length < 3 ) return [];
+
+        return pokemonNameList.filter( pokemon =>
+            pokemon.name.toLocaleLowerCase().includes(term.toLocaleLowerCase())
+        );
+
+    },[term])
+
     return (
         <View style={[ globalTheme.globalMargin, { paddingTop: top + 10 }]}>
             <TextInput 
@@ -26,13 +46,13 @@ export const SearchScreen = () => {
                 mode="flat"
                 autoFocus
                 autoCorrect={false}
-                onChangeText={ value => console.log(value) }
-                value={''}
+                onChangeText={ setTerm }
+                value={term}
             />
 
             <ActivityIndicator style={{ paddingTop:20 }}/>
 
-            <Text>{ JSON.stringify( pokemonNameList,null,2) }</Text>
+            <Text>{ JSON.stringify( pokemonNameIdList,null,2) }</Text>
 
             <FlatList
                 data={ [] as Pokemon[] }
