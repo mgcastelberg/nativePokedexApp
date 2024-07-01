@@ -5,9 +5,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { Pokemon } from '../../../domain/entities/pokemon';
 import { PokemonCard } from '../../components/pokemons/PokemonCard';
-import { getPokemonNamesWithId } from '../../../actions';
+import { getPokemonNamesWithId, getPokemonsByIds } from '../../../actions';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { FullScreenLoader } from '../../components/ui/FullScreenLoader';
 
 export const SearchScreen = () => {
 
@@ -39,6 +40,17 @@ export const SearchScreen = () => {
 
     },[term])
 
+    // UseQuery para los pokeIds
+    const { isLoading: isloadingPokemos, data: pokemons = [] } = useQuery({
+        queryKey: ['pokemons', 'by', pokemonNameIdList],
+        queryFn: () => getPokemonsByIds( pokemonNameIdList.map( pokemon => pokemon.id ) ),
+        staleTime: 1000 * 60 * 5 // 5 mins
+    })
+
+    if ( isLoading ) {
+        return (<FullScreenLoader/>);
+    }
+
     return (
         <View style={[ globalTheme.globalMargin, { paddingTop: top + 10 }]}>
             <TextInput 
@@ -50,17 +62,18 @@ export const SearchScreen = () => {
                 value={term}
             />
 
-            <ActivityIndicator style={{ paddingTop:20 }}/>
+            {isloadingPokemos && <ActivityIndicator style={{ paddingTop:20 }}/>}
 
-            <Text>{ JSON.stringify( pokemonNameIdList,null,2) }</Text>
+            {/* <Text>{ JSON.stringify( pokemonNameIdList,null,2) }</Text> */}
 
             <FlatList
-                data={ [] as Pokemon[] }
+                data={ pokemons }
                 keyExtractor={ (pokemon, index) => `${pokemon.id}-${index}`}
                 numColumns={ 2 }
                 style={{ paddingTop: top + 20 }}
                 renderItem={ ({item}) => <PokemonCard pokemon={ item }/> }
                 showsVerticalScrollIndicator={false} //quita la barra scoll Vertical
+                ListFooterComponent={ <View style={{ height:120 }} />}
             />
 
         </View>
