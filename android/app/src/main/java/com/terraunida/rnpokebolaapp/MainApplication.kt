@@ -1,4 +1,4 @@
-package com.pokedex
+package com.terraunida.rnpokebolaapp
 
 import android.app.Application
 import com.facebook.react.PackageList
